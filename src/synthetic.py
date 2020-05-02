@@ -39,6 +39,7 @@ def main():
         image_loc = os.path.join(config.DATA_DIR, f_name)
         image = cv.imread(image_loc)
         make_synthetic(image, f_out)
+        count += 1
         
 
 if __name__ == "__main__":
