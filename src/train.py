@@ -85,11 +85,14 @@ def main():
             mean=ds_mean, 
             std=ds_std)
     ])
+
+    txf_processed = transforms.Compose([
+        transforms.ToTensor()
+    ])
+
     if args.synthetic:
-        print("Using synthetic data")
-        
-        train_ds = CaptchaDataset(csv_file=config.SYN_TRAIN_DATA, root_dir=config.SYN_DIR)
-        test_ds = CaptchaDataset(csv_file=config.SYN_TEST_DATA, root_dir=config.SYN_DIR)
+        train_ds = CaptchaDataset(csv_file=config.SYN_TRAIN_DATA, root_dir=config.SYN_DIR, transform=txf_processed)
+        test_ds = CaptchaDataset(csv_file=config.SYN_TEST_DATA, root_dir=config.SYN_DIR, transform=txf_processed)
     else:
         train_ds = CaptchaDataset(csv_file=config.TRAIN_DATA, root_dir=config.DATA_DIR, transform=transform)
         test_ds = CaptchaDataset(csv_file=config.TEST_DATA, root_dir=config.DATA_DIR, transform=transform)
