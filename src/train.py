@@ -65,7 +65,8 @@ def main():
                         help='random seed (default: 1)')
     parser.add_argument('--log-interval', type=int, default=10, metavar='N',
                         help='how many batches to wait before logging training status')
-
+    parser.add_argument('--synthetic', action='store_true', default=False, 
+                        help='if we want to train on synthetic data')
     parser.add_argument('--save-model', action='store_true', default=False,
                         help='For Saving the current Model')
     args = parser.parse_args()
@@ -84,8 +85,14 @@ def main():
             mean=ds_mean, 
             std=ds_std)
     ])
-    train_ds = CaptchaDataset(csv_file=config.TRAIN_DATA, root_dir=config.DATA_DIR, transform=transform)
-    test_ds = CaptchaDataset(csv_file=config.TEST_DATA, root_dir=config.DATA_DIR, transform=transform)
+    if args.synthetic:
+        print("Using synthetic data")
+        
+        train_ds = CaptchaDataset(csv_file=config.SYN_TRAIN_DATA, root_dir=config.SYN_DIR)
+        test_ds = CaptchaDataset(csv_file=config.SYN_TEST_DATA, root_dir=config.SYN_DIR)
+    else:
+        train_ds = CaptchaDataset(csv_file=config.TRAIN_DATA, root_dir=config.DATA_DIR, transform=transform)
+        test_ds = CaptchaDataset(csv_file=config.TEST_DATA, root_dir=config.DATA_DIR, transform=transform)
     train_loader = DataLoader(train_ds, batch_size=args.batch_size, shuffle=True, **kwargs)
     test_loader = DataLoader(test_ds, batch_size=args.batch_size, shuffle=True, **kwargs)
 

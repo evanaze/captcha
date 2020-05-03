@@ -14,7 +14,7 @@ if __name__ == "__main__":
         df_all.loc[idx, ["filename", "target"]] = (f, int(f.split("_")[0]))
     # train test split
     X, y = df_all.filename, df_all.target - 1
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.50, random_state=42, shuffle=True)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.50, random_state=config.RAND_STATE, shuffle=True)
     df_train = pd.DataFrame({"filename": X_train, "target": y_train}).reset_index(drop=True)
     df_test = pd.DataFrame({"filename": X_test, "target": y_test})
     
