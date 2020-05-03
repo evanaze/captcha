@@ -78,24 +78,21 @@ def main():
 
     kwargs = {'num_workers': 1, 'pin_memory': True} if use_cuda else {}
 
-    ds_mean, ds_std = get_dataset_stats()
-    transform = transforms.Compose([
-        transforms.ToTensor(),
-        transforms.Normalize(
-            mean=ds_mean, 
-            std=ds_std)
-    ])
-
-    txf_processed = transforms.Compose([
-        transforms.ToTensor()
-    ])
-
     if args.synthetic:
-        train_ds = CaptchaDataset(csv_file=config.SYN_TRAIN_DATA, root_dir=config.SYN_DIR, transform=txf_processed)
-        test_ds = CaptchaDataset(csv_file=config.SYN_TEST_DATA, root_dir=config.SYN_DIR, transform=txf_processed)
+        transform = transforms.ToTensor()
+        train_ds = CaptchaDataset(csv_file=config.SYN_TRAIN_DATA, root_dir=config.SYN_DIR, transform=transform)
+        test_ds = CaptchaDataset(csv_file=config.SYN_TEST_DATA, root_dir=config.SYN_DIR, transform=transform)
     else:
+        ds_mean, ds_std = get_dataset_stats()
+        transform = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize(
+                mean=ds_mean, 
+                std=ds_std)
+        ])
         train_ds = CaptchaDataset(csv_file=config.TRAIN_DATA, root_dir=config.DATA_DIR, transform=transform)
         test_ds = CaptchaDataset(csv_file=config.TEST_DATA, root_dir=config.DATA_DIR, transform=transform)
+    
     train_loader = DataLoader(train_ds, batch_size=args.batch_size, shuffle=True, **kwargs)
     test_loader = DataLoader(test_ds, batch_size=args.batch_size, shuffle=True, **kwargs)
 

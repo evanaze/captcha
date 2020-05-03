@@ -20,3 +20,8 @@ If they update the captcha rules or you feel the need to retrain the model, here
 5. Run `train.py` to retrain the model.  
 
 Finally, the model lives in the models directory.
+
+## To-Do
+* Experiment more with OpenCV on processed data, try to get cleaner squares
+* Ask for more data
+* K-Fold CV
