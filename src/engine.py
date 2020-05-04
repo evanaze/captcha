@@ -2,11 +2,17 @@ import os
 
 import pandas as pd
 from torchvision import transforms
+from tqdm import tqdm
 
 from .utils import get_dataset_stats
 from .dataset import CaptchaDataset
 from .train import Train
 from . import config
+
+
+""" Contains the main scripts for training and evaluation.
+
+"""
 
 ds_mean, ds_std = get_dataset_stats()
 transform = transforms.Compose([
@@ -19,6 +25,15 @@ logger = {
     "fold": [i for i in range(config.N_FOLDS)],
     "val_score": []
 }
+
+def train(data_loader, model, optimizer, device, accumulation_steps):
+    model.train()
+
+    for bi, d in tqdm(enumerate(data_loader), total=len(data_loader)):
+        pass
+
+def eval():
+    pass
 
 if __name__ == "__main__":
     for fold in range(config.N_FOLDS):

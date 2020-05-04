@@ -12,6 +12,10 @@ from .model import Net
 from . import config
 from .utils import get_dataset_stats
 
+""" Runs the engine to implement model training.
+
+    Only has one method: run() to perform the model training
+"""
 
 def train(args, model, device, train_loader, optimizer, epoch):
     model.train()
