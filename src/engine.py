@@ -14,36 +14,37 @@ from . import config
 
 """
 
-ds_mean, ds_std = get_dataset_stats()
-transform = transforms.Compose([
-    transforms.ToTensor(),
-    transforms.Normalize(
-        mean=ds_mean, 
-        std=ds_std)
-])
-logger = {
-    "fold": [i for i in range(config.N_FOLDS)],
-    "val_score": []
-}
-
-def train(data_loader, model, optimizer, device, accumulation_steps):
+def train_fn(model, device, data_loader, optimizer, epoch):
     model.train()
+    for batch_idx, (data, target) in tqdm(enumerate(data_loader), total=len(data_loader)):
+        data, target = data.to(device), target.to(device)
+        optimizer.zero_grad()
+        output = model(data)
+        loss = F.nll_loss(output, target)
+        loss.backward()
+        optimizer.step()
+        if batch_idx % 10 == 0:
+            print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
+                epoch, batch_idx * len(data), len(data_loader.dataset),
+                100. * batch_idx / len(data_loader), loss.item()))
 
-    for bi, d in tqdm(enumerate(data_loader), total=len(data_loader)):
-        pass
 
-def eval():
-    pass
+def eval_fn(model, device, data_loader):
+    model.eval()
+    test_loss = 0
+    correct = 0
+    with torch.no_grad():
+        for data, target in tqdm(data_loader, total=len(data_loader)):
+            data, target = data.to(device), target.to(device)
+            output = model(data)
+            test_loss += F.nll_loss(output, target, reduction='sum').item()  # sum up batch loss
+            pred = output.argmax(dim=1, keepdim=True)  # get the index of the max log-probability
+            correct += pred.eq(target.view_as(pred)).sum().item()
 
-if __name__ == "__main__":
-    for fold in range(config.N_FOLDS):
-        df_train = pd.read_csv(config.TRAIN_DATA)
-        df_train[df_train["kfold"] != fold].to_csv("input/temp_train.csv", index=False)
-        df_train[df_train["kfold"] == fold].to_csv("input/temp_val.csv", index=False)
-        train_ds = CaptchaDataset(csv_file="input/temp_train.csv", root_dir=config.DATA_DIR, transform=transform)
-        valid_ds = CaptchaDataset(csv_file="input/temp_val.csv", root_dir=config.DATA_DIR, transform=transform)
-        t = Train(train_ds, valid_ds, fold)
-        t.main()
-        logger["val_score"].append(t.test_loss)
-    os.remove("input/temp_train.csv"); os.remove("input/temp_val.csv")
+    test_loss /= len(data_loader.dataset)
+
+    print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
+        test_loss, correct, len(data_loader.dataset),
+        100. * correct / len(data_loader.dataset)))
+
     

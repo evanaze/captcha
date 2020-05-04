@@ -4,16 +4,19 @@ import matplotlib.pyplot as plt
 import imutils
 import cv2 as cv 
 from .shape_detector import ShapeDetector
+from .preprocess import preprocess
+
+""" Uses OpenCV to count the number of squares in a Captcha
+
+"""
 
 
 def n_squares(image, display=False):
-    laplacian = cv.Laplacian(image, cv.CV_64F)
-    squares_channel = cv.split(laplacian)[0].astype(np.uint8)
-    thresh = cv.threshold(squares_channel, 60, 255, cv.THRESH_BINARY)[1]
+    image = preprocess(image)
     if display:
-        plt.imshow(thresh)
+        plt.imshow(image)
         plt.show()
-    cnts = cv.findContours(thresh.copy(), cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
+    cnts = cv.findContours(image.copy(), cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
     cnts = imutils.grab_contours(cnts)
     sd = ShapeDetector()
     n_squares = 0

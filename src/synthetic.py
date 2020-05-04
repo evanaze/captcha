@@ -6,12 +6,11 @@ import matplotlib.pyplot as plt
 from skimage.transform import rotate
 from skimage.io import imsave
 from . import config
+from .preprocess import preprocess
 
 
 def make_synthetic(image, f_out):
-    laplacian = cv.Laplacian(image, cv.CV_64F)
-    squares_channel = cv.split(laplacian)[0].astype(np.uint8)
-    thresh = cv.threshold(squares_channel, 60, 255, cv.THRESH_BINARY)[1]
+    thresh = preprocess(image)
     f_split = f_out.split("."); f_split[1] = ".png"
     imgs = [0] * 4
     for i in range(4):
