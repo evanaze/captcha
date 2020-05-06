@@ -1,5 +1,6 @@
 from __future__ import print_function, absolute_import
 import argparse
+import pandas as pd
 import torch
 import torch.optim as optim
 from torchvision import transforms
@@ -54,7 +55,7 @@ def run():
             transform=transform
         )
         valid_ds = CaptchaDataset(
-            csv_file=config.SYN_TEST_DATA, 
+            csv_file=config.SYN_VALID_DATA, 
             root_dir=config.SYN_DIR, 
             transform=transform
         )

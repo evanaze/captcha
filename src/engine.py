@@ -1,13 +1,4 @@
-import os
-
-import pandas as pd
-from torchvision import transforms
 from tqdm import tqdm
-
-from .utils import get_dataset_stats
-from .dataset import CaptchaDataset
-from .train import Train
-from . import config
 
 
 """ Contains the main scripts for training and evaluation.
