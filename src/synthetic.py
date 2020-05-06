@@ -7,6 +7,8 @@ from skimage.transform import rotate
 from skimage.io import imsave
 from . import config
 from .preprocess import preprocess
+import warnings
+warnings.filterwarnings("ignore")
 
 
 def make_synthetic(image, f_out):
@@ -25,7 +27,7 @@ def make_synthetic(image, f_out):
             dtype=cv.CV_8U
         )
         img_name = f_split[0] + "_" + str(angle) + f_split[1]
-        img_loc = "input/captcha_de-noised/"+img_name
+        img_loc = config.DATA_DIR+'/'+img_name
         imsave(img_loc, img)
         imgs[i] = img_name
     return imgs

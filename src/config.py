@@ -1,11 +1,10 @@
 N_FOLDS=2
 DATA_DIR="input/raw"
-TRAINING_FILE="input/train.csv"
 TRAIN_DATA="input/train.csv"
 TEST_DATA="input/test.csv"
-TRAIN_BATCH_SIZE=4
-VALID_BATCH_SIZE=1
 SYN_DIR="input/processed"
-SYN_TRAIN_DATA="input/syn_train.csv"
-SYN_TEST_DATA="input/syn_test.csv"
+SYN_TRAIN_DATA="input/train_temp.csv"
+SYN_VALID_DATA="input/valid_temp.csv"
+TRAIN_BATCH_SIZE=1
+VALID_BATCH_SIZE=25
 RAND_STATE=1212

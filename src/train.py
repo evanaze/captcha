@@ -30,8 +30,6 @@ def run():
                         help='Learning rate step gamma (default: 0.7)')
     parser.add_argument('--no-cuda', action='store_true', default=False,
                         help='disables CUDA training')
-    parser.add_argument('--synthetic', action='store_true', default=False, 
-                        help='if we want to train on synthetic data')
     parser.add_argument('--save-model', action='store_true', default=False,
                         help='For Saving the current Model')
 
@@ -46,6 +44,9 @@ def run():
 
     for fold in range(config.N_FOLDS):
         # split data into folds
+        train = pd.read_csv("input/syn_train.csv")
+        train[train.kfold != fold].to_csv("input/train_temp.csv", index=False)
+        train[train.kfold == fold].to_csv("input/valid_temp.csv", index=False)
         transform = transforms.ToTensor()
         train_ds = CaptchaDataset(
             csv_file=config.SYN_TRAIN_DATA, 
@@ -57,7 +58,6 @@ def run():
             root_dir=config.SYN_DIR, 
             transform=transform
         )
-        
         train_loader = DataLoader(
             train_ds, 
             batch_size=config.TRAIN_BATCH_SIZE, 
