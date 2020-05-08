@@ -83,8 +83,8 @@ def run():
         optimizer = optim.Adadelta(model.parameters(), lr=args.lr)
         scheduler = StepLR(optimizer, step_size=1, gamma=args.gamma)
         for epoch in range(1, args.epochs + 1):
-            train_fn(model, device, train_loader, optimizer, epoch)
-            eval_fn(model, device, valid_loader)
+            train_loss = train_fn(model, device, train_loader, optimizer, epoch)
+            test_loss = eval_fn(model, device, valid_loader)
             scheduler.step()
             log[str(datetime.now().time())] = {
                 "model": model_name,

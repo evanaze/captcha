@@ -8,7 +8,7 @@ import torch.nn.functional as F
 
 def train_fn(model, device, data_loader, optimizer, epoch):
     model.train()
-    for batch_idx, (data, target) in tqdm(enumerate(data_loader), total=len(data_loader)):
+    for batch_idx, (data, target) in enumerate(data_loader):
         data, target = data.to(device), target.to(device)
         optimizer.zero_grad()
         output = model(data)
@@ -26,7 +26,7 @@ def eval_fn(model, device, data_loader):
     test_loss = 0
     correct = 0
     with torch.no_grad():
-        for data, target in tqdm(data_loader, total=len(data_loader)):
+        for data, target in data_loader:
             data, target = data.to(device), target.to(device)
             output = model(data)
             test_loss += F.nll_loss(output, target, reduction='sum').item()  # sum up batch loss
@@ -38,5 +38,6 @@ def eval_fn(model, device, data_loader):
     print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
         test_loss, correct, len(data_loader.dataset),
         100. * correct / len(data_loader.dataset)))
+    return test_loss
 
     
