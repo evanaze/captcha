@@ -45,7 +45,7 @@ def run():
 
     for fold in range(config.N_FOLDS):
         # split data into folds
-        train = pd.read_csv("input/syn_train.csv")
+        train = pd.read_csv("input/train_proc.csv")
         train[train.kfold != fold].to_csv("input/train_temp.csv", index=False)
         train[train.kfold == fold].to_csv("input/valid_temp.csv", index=False)
         transform = transforms.ToTensor()
