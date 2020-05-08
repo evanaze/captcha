@@ -12,7 +12,8 @@ def preprocess(image):
     laplacian = cv.Laplacian(image, cv.CV_64F)
     squares_channel = cv.split(laplacian)[0].astype(np.uint8)
     thresh = cv.threshold(squares_channel, 60, 255, cv.THRESH_BINARY)[1]
-    return thresh
+    src = cv.resize(thresh, (300, 300), interpolation=cv.INTER_AREA)
+    return src
 
 def main():
     """A way to observe the preprocessing"""

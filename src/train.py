@@ -1,5 +1,8 @@
 from __future__ import print_function, absolute_import
 import argparse
+import json
+from datetime import datetime
+
 import pandas as pd
 import torch
 import torch.optim as optim
@@ -43,7 +46,10 @@ def run():
 
     kwargs = {'num_workers': 1, 'pin_memory': True} if use_cuda else {}
 
+    log = {}
+
     for fold in range(config.N_FOLDS):
+        print(f"Fold: {fold}")
         # split data into folds
         train = pd.read_csv("input/train_proc.csv")
         train[train.kfold != fold].to_csv("input/train_temp.csv", index=False)
@@ -73,16 +79,24 @@ def run():
         )
 
         model = Net().to(device)
+        model_name = "captcha_cnn"
         optimizer = optim.Adadelta(model.parameters(), lr=args.lr)
-
         scheduler = StepLR(optimizer, step_size=1, gamma=args.gamma)
         for epoch in range(1, args.epochs + 1):
             train_fn(model, device, train_loader, optimizer, epoch)
             eval_fn(model, device, valid_loader)
             scheduler.step()
-
+            log[str(datetime.now().time())] = {
+                "model": model_name,
+                "fold": fold,
+                "epoch": epoch,
+                "val_err": test_loss
+            }
+        with open(f"logs/{datetime.now()}.json", "w") as f:
+            json.dump(log, f)
         if args.save_model:
-            torch.save(model.state_dict(), f"models/captcha_cnn_f{fold}.pt")
+            torch.save(model.state_dict(), f"models/{model_name}_f{fold}.pt")
+
 
 
 if __name__ == '__main__':

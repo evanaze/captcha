@@ -5,10 +5,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 import torch
-import torch.optim as optim
-import torchvision
-import torchvision.transforms as transforms
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import Dataset
 from skimage import io, transform
 
 from . import config
@@ -42,8 +39,8 @@ class CaptchaDataset(Dataset):
 
 
 if __name__ == "__main__":
-    captcha_dataset = CaptchaDataset(csv_file='input/train.csv',
-                                     root_dir='input/captcha_named')
+    captcha_dataset = CaptchaDataset(csv_file=config.TRAIN_DATA,
+                                     root_dir=config.PROC_DIR)
 
     fig = plt.figure()
 

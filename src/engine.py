@@ -1,5 +1,6 @@
 from tqdm import tqdm
-
+import torch
+import torch.nn.functional as F
 
 """ Contains the main scripts for training and evaluation.
 
@@ -17,7 +18,7 @@ def train_fn(model, device, data_loader, optimizer, epoch):
         if batch_idx % 10 == 0:
             print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
                 epoch, batch_idx * len(data), len(data_loader.dataset),
-                100. * batch_idx / len(data_loader), loss.item()))
+                100. * batch_idx / len(data_loader), loss.item())) 
 
 
 def eval_fn(model, device, data_loader):
