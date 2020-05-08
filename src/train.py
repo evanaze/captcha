@@ -50,13 +50,13 @@ def run():
         train[train.kfold == fold].to_csv("input/valid_temp.csv", index=False)
         transform = transforms.ToTensor()
         train_ds = CaptchaDataset(
-            csv_file=config.SYN_TRAIN_DATA, 
-            root_dir=config.SYN_DIR, 
+            csv_file=config.TRAIN_DATA, 
+            root_dir=config.PROC_DIR, 
             transform=transform
         )
         valid_ds = CaptchaDataset(
-            csv_file=config.SYN_VALID_DATA, 
-            root_dir=config.SYN_DIR, 
+            csv_file=config.VALID_DATA, 
+            root_dir=config.PROC_DIR, 
             transform=transform
         )
         train_loader = DataLoader(

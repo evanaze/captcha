@@ -18,15 +18,18 @@ from .preprocess import preprocess
 """
 
 class MakeData:
+    "This class ingests the raw data and creates the full training set."
     def __init__(self):
         self.files = sorted(os.listdir(config.RAW_DIR))
         self.files = [f for f in self.files if not f.startswith('.')]
         self.n = len(self.files)
-        self.df_all = pd.DataFrame(columns=["filename", "target"], index=np.empty(self.n))
 
     def split_train_test(self):
+        filenames, targets = [0]*self.n, np.empty(self.n, dtype=int)
         for idx, f in enumerate(self.files):
-            self.df_all.loc[idx, ["filename", "target"]] = (f, int(f.split("_")[0]))
+            filenames[idx] = f
+            targets[idx] = int(f.split("_")[0])
+        self.df_all = pd.DataFrame({"filename": filenames, "target": targets})
         # train test split
         X, y = self.df_all.filename, self.df_all.target - 1
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=config.TEST_SIZE, random_state=config.RAND_STATE, shuffle=True)
@@ -60,24 +63,29 @@ class MakeData:
             self.imgs[i] = img_name
 
     def make_train_df(self):
-        df_proc = pd.DataFrame(columns=["filename", "target", "kfold"], index=range(4*self.n)).T
-        count = 0
-        print("Creating synthetic data")
+        "Turn the train split into processed data."
+        m = len(self.df_train)
+        df_proc = pd.DataFrame(
+            columns=["filename", "target", "kfold"], 
+            index=range(4*m)
+        ).T
+        # make the synthetic, processed data for each image
         for index, row in self.df_train.iterrows():
+            print(f"Processing image {index} of {m}", end="\r")
             target = row["target"]
             f_name = row["filename"]
-            self.f_out = "img" + str(count) + "_" + str(target) + ".png"
-            image_loc = os.path.join(config.DATA_DIR, f_name)
-            image = cv.imread(image_loc)
+            self.f_out = "img" + str(index) + "_" + str(target) + ".png"
+            image_loc = os.path.join(config.RAW_DIR, f_name)
+            self.image = cv.imread(image_loc)
             self.make_synthetic()
             for i, img_loc in enumerate(self.imgs):
-                df_proc[4*count + i] = [img_loc, target]
-            count += 1
+                df_proc[4*index + i] = [img_loc, target, -1]
         kf = KFold(n_splits=config.N_FOLDS)
+        df_proc = df_proc.T
         X_proc = df_proc["filename"]; y_proc = df_proc["target"]
         for fold, (train_idx, val_idx) in enumerate(kf.split(X=X_proc, y=y_proc)):
             df_proc.loc[val_idx, 'kfold'] = fold
-        df_proc.T.to_csv("input/train_proc.csv", index=False)
+        df_proc.to_csv("input/train_proc.csv", index=False)
 
     def main(self):
         self.split_train_test()
