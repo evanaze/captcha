@@ -144,3 +144,6 @@ cython_debug/
 input/raw/*.png 
 input/processed/*.png 
 input/*.csv
+
+# logs
+logs/*.json
