@@ -1,1 +1,0 @@
-{"15:33:25.194508": {"model": "captcha_cnn", "fold": 0, "epoch": 1, "val_err": 1.4777524165618114}, "15:35:49.735753": {"model": "captcha_cnn", "fold": 1, "epoch": 1, "val_err": 1.3876571213785172}, "15:38:13.700399": {"model": "captcha_cnn", "fold": 2, "epoch": 1, "val_err": 1.3808598182780838}}
