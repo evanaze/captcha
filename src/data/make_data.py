@@ -7,10 +7,10 @@ import cv2 as cv
 from sklearn.model_selection import KFold, train_test_split
 import matplotlib.pyplot as plt
 from skimage.transform import rotate
-
 from skimage.io import imsave
-from . import config
-from .preprocess import preprocess
+
+from ..models import config
+from ..features.preprocess import preprocess
 
 """ This script makes the full processed training data.
 

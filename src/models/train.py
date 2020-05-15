@@ -14,7 +14,6 @@ from torch.utils.data import DataLoader
 from .dataset import CaptchaDataset
 from .model import Net
 from . import config
-from .utils import get_dataset_stats
 from .engine import train_fn, eval_fn
 
 """ Runs the engine to implement model training.

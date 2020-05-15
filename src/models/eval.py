@@ -2,7 +2,7 @@ import os
 import pandas as pd
 from sklearn.metrics import precision_score
 import cv2 as cv 
-from .n_squares import n_squares
+from ..features.n_squares import n_squares
 from .predict import predict
 from . import config
 
