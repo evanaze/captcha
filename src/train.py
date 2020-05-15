@@ -98,6 +98,5 @@ def run():
             torch.save(model.state_dict(), f"models/{model_name}_f{fold}.pt")
 
 
-
 if __name__ == '__main__':
     run()
