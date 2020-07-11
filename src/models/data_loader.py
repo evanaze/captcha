@@ -8,7 +8,8 @@ import torch
 from torch.utils.data import Dataset
 from skimage import io, transform
 
-from . import config
+from .. import config
+
 
 class CaptchaDataset(Dataset):
     """Captcha image dataset

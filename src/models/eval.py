@@ -4,7 +4,7 @@ from sklearn.metrics import precision_score
 import cv2 as cv 
 from ..features.n_squares import n_squares
 from .predict import predict
-from . import config
+from .. import config
 
 "The full eval script."
 

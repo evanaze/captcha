@@ -3,8 +3,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 import imutils
 import cv2 as cv 
+
 from .shape_detector import ShapeDetector
 from .preprocess import preprocess
+from .. import config
 
 """ Uses OpenCV to count the number of squares in a Captcha
 
@@ -14,8 +16,8 @@ from .preprocess import preprocess
 def n_squares(image, display=False):
     image = preprocess(image)
     if display:
-        plt.imshow(image)
-        plt.show()
+        cv.imshow("input image", image)
+        cv.waitKey()
     cnts = cv.findContours(image.copy(), cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
     cnts = imutils.grab_contours(cnts)
     sd = ShapeDetector()
@@ -57,7 +59,15 @@ def main():
     ap.add_argument("-i", "--image", required=True,
         help="path to the input image")
     args = vars(ap.parse_args())
-    image = cv.imread(args["image"])
+    # parse the image from the command line
+    ap = argparse.ArgumentParser()
+    ap.add_argument("-i", "--image", required=True,
+        help="path to the input image")
+    args = ap.parse_args()
+    # read in the raw image
+    image_loc = config.RAW_DIR + "/" + args.image
+    image = cv.imread(image_loc)
+    # show the processed image
     print(n_squares(image, True))
 
 if __name__ == "__main__":

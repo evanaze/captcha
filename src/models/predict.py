@@ -8,7 +8,7 @@ import torch
 from torchvision import transforms
 
 from .model import Net
-from . import config
+from .. import config
 
 
 def predict(file_name=None):

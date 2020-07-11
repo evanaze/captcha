@@ -17,8 +17,8 @@ from torch.utils.data import DataLoader
 
 from .data_loader import CaptchaDataset
 from .model import Net
-from . import config
 from .engine import train_fn, eval_fn
+from .. import config
 
 
 def run():
