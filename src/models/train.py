@@ -1,3 +1,7 @@
+""" Runs the engine to implement model training.
+
+    Only has one method: run() to perform the model training
+"""
 from __future__ import print_function, absolute_import
 import argparse
 import json
@@ -15,11 +19,6 @@ from .data_loader import CaptchaDataset
 from .model import Net
 from . import config
 from .engine import train_fn, eval_fn
-
-""" Runs the engine to implement model training.
-
-    Only has one method: run() to perform the model training
-"""
 
 
 def run():

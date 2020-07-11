@@ -15,11 +15,11 @@ def predict(file_name=None):
     "This is for you to write"
     # Load the image
     true = int(file_name.split('_')[0])
-    file_loc = os.path.join(config.DATA_DIR, file_name)
+    file_loc = os.path.join(config.RAW_DIR, file_name)
     image = io.imread(file_loc)
     # predict
     model = Net()
-    model.load_state_dict(torch.load("models/captcha_cnn.pt"))
+    model.load_state_dict(torch.load("models/captcha_cnn_f0.pt"))
     model.eval()
     transform = transforms.Compose([
         transforms.ToTensor(),
