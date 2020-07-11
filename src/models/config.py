@@ -1,8 +1,8 @@
-RAW_DIR="input/raw"
-PROC_DIR="input/processed"
-TRAIN_DATA="input/train_temp.csv"
-VALID_DATA="input/valid_temp.csv"
-TEST_DATA="input/test.csv"
+RAW_DIR="data/raw"
+PROC_DIR="data/processed"
+TRAIN_DATA="data/train_temp.csv"
+VALID_DATA="data/valid_temp.csv"
+TEST_DATA="data/test.csv"
 
 N_FOLDS=3
 TEST_SIZE=0.1
