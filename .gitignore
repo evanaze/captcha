@@ -141,8 +141,10 @@ cython_debug/
 .vscode/
 
 # data
-input/raw/*.png 
-input/processed/*.png 
+input/raw/*
+!input/raw/.gitkeep
+input/processed/*
+!input/processed/.gitkeep
 input/*.csv
 
 # logs
