@@ -11,7 +11,7 @@ import torch.nn.functional as F
 from torch.optim.lr_scheduler import StepLR
 from torch.utils.data import DataLoader
 
-from .dataset import CaptchaDataset
+from .data_loader import CaptchaDataset
 from .model import Net
 from . import config
 from .engine import train_fn, eval_fn

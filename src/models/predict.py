@@ -1,3 +1,5 @@
+""" The overall predict script for the full model
+"""
 import os
 import argparse
 
@@ -8,9 +10,6 @@ from torchvision import transforms
 from .model import Net
 from . import config
 
-""" The overall predict script for the full model
-
-"""
 
 def predict(file_name=None):
     "This is for you to write"

@@ -1,10 +1,9 @@
+""" Contains the main scripts for training and evaluation.
+"""
 from tqdm import tqdm
 import torch
 import torch.nn.functional as F
 
-""" Contains the main scripts for training and evaluation.
-
-"""
 
 def train_fn(model, device, data_loader, optimizer, epoch):
     model.train()
