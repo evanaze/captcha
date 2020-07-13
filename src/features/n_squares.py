@@ -1,3 +1,5 @@
+""" Uses OpenCV to count the number of squares in a Captcha
+"""
 import argparse
 import numpy as np
 import matplotlib.pyplot as plt
@@ -7,10 +9,6 @@ import cv2 as cv
 from .shape_detector import ShapeDetector
 from .preprocess import preprocess
 from .. import config
-
-""" Uses OpenCV to count the number of squares in a Captcha
-
-"""
 
 
 def n_squares(image, display=False):
@@ -44,11 +42,13 @@ def n_squares(image, display=False):
             cv.waitKey(0)
         else:
             pass
-        if a > 1150 and a < 1900:
+        # the size thresholds for our heuristic
+        c1, c2, c3 = 1800, 3500, 5000
+        if a > c1 and a < c2:
             n_squares += 2
-        elif a > 1900 and a < 3000:
+        elif a > c2 and a < c3:
             n_squares += 3
-        elif a > 3000:
+        elif a > c3:
             n_squares += 4
         elif shape == "square":
             n_squares += 1

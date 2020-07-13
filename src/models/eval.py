@@ -1,3 +1,4 @@
+"""The full eval script."""
 import os
 import pandas as pd
 from sklearn.metrics import precision_score
@@ -6,10 +7,11 @@ from ..features.n_squares import n_squares
 from .predict import predict
 from .. import config
 
-"The full eval script."
 
-def cv():
-    df_all = pd.read_csv("input/all.csv")
+def square_counting():
+    "Evaluates the square counting method on the full data"
+    # read in the full data
+    df_all = pd.read_csv("data/all.csv")
     y_pred, y_true = [], []
     for index, row in df_all.iterrows():
         true = row["target"]
@@ -26,9 +28,9 @@ def cv():
     return precision
 
 def dl():
-    """Evaluate on the test set"""
+    """Evaluate the dl model on the test set"""
     y_true, y_pred = [], []
-    test = pd.read_csv("input/test.csv")
+    test = pd.read_csv("data/test.csv")
     for f in test.filename:
         true, res = predict(f)
         y_true.append(true)
