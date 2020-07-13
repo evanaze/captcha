@@ -141,11 +141,11 @@ cython_debug/
 .vscode/
 
 # data
-input/raw/*
-!input/raw/.gitkeep
-input/processed/*
-!input/processed/.gitkeep
-input/*.csv
+data/raw/*
+!data/raw/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+data/*.csv
 
 # logs
 logs/*.json
