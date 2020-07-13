@@ -141,6 +141,7 @@ cython_debug/
 .vscode/
 
 # data
+data/*
 data/raw/*
 !data/raw/.gitkeep
 data/processed/*
