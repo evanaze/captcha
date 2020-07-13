@@ -49,9 +49,9 @@ def run():
     for fold in range(config.N_FOLDS):
         print(f"Fold: {fold}")
         # split data into folds
-        train = pd.read_csv("input/train_proc.csv")
-        train[train.kfold != fold].to_csv("input/train_temp.csv", index=False)
-        train[train.kfold == fold].to_csv("input/valid_temp.csv", index=False)
+        train = pd.read_csv("data/train_proc.csv")
+        train[train.kfold != fold].to_csv("data/train_temp.csv", index=False)
+        train[train.kfold == fold].to_csv("data/valid_temp.csv", index=False)
         transform = transforms.ToTensor()
         train_ds = CaptchaDataset(
             csv_file=config.TRAIN_DATA, 

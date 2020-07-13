@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 from skimage.transform import rotate
 from skimage.io import imsave
 
-from ..models import config
+from .. import config
 from ..features.preprocess import preprocess
 
 """ This script makes the full processed training data.
@@ -35,9 +35,9 @@ class MakeData:
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=config.TEST_SIZE, random_state=config.RAND_STATE, shuffle=True)
         self.df_train = pd.DataFrame({"filename": X_train, "target": y_train}).reset_index(drop=True)
         df_test = pd.DataFrame({"filename": X_test, "target": y_test})
-        self.df_train.to_csv("input/train.csv", index=False)
-        df_test.to_csv("input/test.csv", index=False)
-        self.df_all.to_csv("input/all.csv", index=False)
+        self.df_train.to_csv("data/train.csv", index=False)
+        df_test.to_csv("data/test.csv", index=False)
+        self.df_all.to_csv("data/all.csv", index=False)
 
     def make_synthetic(self):
         "Make 4 copies of the processed image"
@@ -87,7 +87,7 @@ class MakeData:
         for fold, (train_idx, val_idx) in enumerate(kf.split(X=X_proc, y=y_proc)):
             df_proc.loc[val_idx, 'kfold'] = fold
         # save to csv
-        df_proc.to_csv("input/train_proc.csv", index=False)
+        df_proc.to_csv("data/train_proc.csv", index=False)
 
     def main(self):
         self.split_train_test()
