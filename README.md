@@ -13,9 +13,9 @@ To use the to predict on a new image, run with the `-i` flag:
 
 ```python -m src.run -i new_image.png```  
 
-Alternatively, to run by retraining on new data:  
+Alternatively, to run by retraining on new data with a learning rate of `0.4`:  
 
-```python -m src.run --retrain```  
+```python -m src.run --retrain --save-model --lr 0.4```  
 or 
 ```make train``` to use the default settings.
 
