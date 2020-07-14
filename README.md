@@ -6,7 +6,10 @@ Pull the repo with the usual command:
 You can download the data for this project from S3 with:
 ```make data```
 
-To use this script to predict on a new image, run with the `-i` flag:  
+And train the model with 
+```make train```.
+
+To use the to predict on a new image, run with the `-i` flag:  
 
 ```python -m src.run -i new_image.png```  
 
@@ -14,7 +17,7 @@ Alternatively, to run by retraining on new data:
 
 ```python -m src.run --retrain```  
 or 
-```make train```
+```make train``` to use the default settings.
 
 ## Requirements
 You just need [Docker](https://www.docker.com) to run this package. If you would like to run this package inside of a local environment, you need Python3 and Pytorch installed. 
