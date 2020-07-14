@@ -1,8 +1,6 @@
 # Captcha Solver and Object Counting
 This is a Python package for solving captchas that look like the one below:
 
-
-
 ## Usage
 Pull the repo with the usual command:  
 
