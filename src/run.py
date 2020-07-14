@@ -8,6 +8,7 @@
 """
 import os
 import argparse
+from . import config
 
 
 def main():
@@ -16,10 +17,10 @@ def main():
                         help="The new image to predict on")
     parser.add_argument("-r", "--retrain", action="store_true", 
                         help="A flag for if we should retrain")
-    parser.add_argument('--epochs', type=int, default=14, metavar='N',
-                        help='number of epochs to train (default: 14)')
-    parser.add_argument('--lr', type=float, default=1.0, metavar='LR',
-                        help='learning rate (default: 1.0)')
+    parser.add_argument('--epochs', type=int, default=config.DEF_EPOCH, metavar='N',
+                        help=f'number of epochs to train (default: {config.DEF_EPOCH})')
+    parser.add_argument('--lr', type=float, default=config.DEF_LR, metavar='LR',
+                        help=f'learning rate (default: {config.DEF_LR})')
     parser.add_argument('--gamma', type=float, default=0.7, metavar='M',
                         help='Learning rate step gamma (default: 0.7)')
     parser.add_argument('--no-cuda', action='store_true',
