@@ -12,18 +12,15 @@ from .. import config
 
 
 def predict(file_name=None):
-    "This is for you to write"
-    # Load the image
-    true = int(file_name.split('_')[0])
-    file_loc = os.path.join(config.RAW_DIR, file_name)
-    image = io.imread(file_loc)
-    # predict
+    "Predict on an image from a dataloader"
+    # load the model
     model = Net()
     model.load_state_dict(torch.load("models/captcha_cnn_f0.pt"))
     model.eval()
-    processed = preprocess(image)
-    output = model(transforms.ToTensor(processed)) # unsqeezing to get in the proper format (1, 3, 200, 200)
-    res = output.argmax(dim=1, keepdim=True).numpy()[0][0] + 1 # choosing the model's result
+    # get the output of the model
+    output = model() 
+    # choosing the model's result
+    res = output.argmax(dim=1, keepdim=True).numpy()[0][0] + 1 
     return true, res
 
 def main():
