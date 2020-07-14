@@ -1,7 +1,11 @@
 # Captcha Solver and Object Counting
+This is a Python package for solving captchas that look like the one below:
+
+
 
 ## Usage
 Pull the repo with the usual command:  
+
 ```git clone https://github.com/evanaze/captcha.git && cd captcha```  
 
 You can download the data for this project from S3 with:  
@@ -10,7 +14,7 @@ You can download the data for this project from S3 with:
 
 And train the model with 
 
-```make train```.
+```make train```
 
 To use the to predict on a new image, run with the `-i` flag:  
 
