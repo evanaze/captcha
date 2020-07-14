@@ -2,7 +2,11 @@
 import os
 import pandas as pd
 from sklearn.metrics import precision_score
+from torchvision import transforms
 import cv2 as cv 
+from torch.utils.data import DataLoader
+
+from .data_loader import CaptchaDataset
 from ..features.n_squares import n_squares
 from .predict import predict
 from .. import config
@@ -29,6 +33,15 @@ def square_counting():
 
 def dl():
     """Evaluate the dl model on the test set"""
+    transform = transforms.toTensor()
+    eval_ds = CaptchaDataset(
+        csv_file=config.TEST_DATA, 
+        root_dir=config.PROC_DIR, 
+        transform=transform
+    )
+    eval_loader = DataLoader(
+        eval_ds
+    )
     y_true, y_pred = [], []
     test = pd.read_csv("data/test.csv")
     for f in test.filename:
@@ -36,3 +49,7 @@ def dl():
         y_true.append(true)
         y_pred.append(res)
     return precision_score(y_true, y_pred, average="micro")
+
+
+if __name__ == "__main__":
+    dl()

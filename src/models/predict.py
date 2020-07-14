@@ -5,9 +5,9 @@ import argparse
 
 from skimage import io
 import torch
-from torchvision import transforms
 
 from .model import Net
+from ..features.preprocess import preprocess
 from .. import config
 
 
@@ -21,14 +21,8 @@ def predict(file_name=None):
     model = Net()
     model.load_state_dict(torch.load("models/captcha_cnn_f0.pt"))
     model.eval()
-    transform = transforms.Compose([
-        transforms.ToTensor(),
-        transforms.Normalize(
-            mean=[0.41851586, 0.37706038, 0.52860934], 
-            std=[0.25431615, 0.32462418, 0.08905637])
-    ])
-    tensor = transform(image)
-    output = model(tensor.unsqueeze(0)) # unsqeezing to get in the proper format (1, 3, 200, 200)
+    processed = preprocess(image)
+    output = model(transforms.ToTensor(processed)) # unsqeezing to get in the proper format (1, 3, 200, 200)
     res = output.argmax(dim=1, keepdim=True).numpy()[0][0] + 1 # choosing the model's result
     return true, res
 
