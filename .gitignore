@@ -150,3 +150,7 @@ data/*.csv
 
 # logs
 logs/*.json
+
+# models
+models/*
+!models/.gitkeep
