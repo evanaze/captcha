@@ -43,7 +43,7 @@ def dl():
         eval_ds
     )
     y_true, y_pred = [0]*len(eval_ds), [0]*len(eval_ds)
-    for i, (data, target) in enumerate(data_loader)
+    for i, (data, target) in enumerate(data_loader):
         res = predict(data)
         y_true[i] = target
         y_pred[i] = res

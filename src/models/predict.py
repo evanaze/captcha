@@ -2,10 +2,8 @@
 """
 import os
 import argparse
-
 from skimage import io
 import torch
-
 from .model import Net
 from ..features.preprocess import preprocess
 from .. import config
