@@ -2,7 +2,7 @@ RAW_DIR="data/raw"
 PROC_DIR="data/processed"
 TRAIN_DATA="data/train_temp.csv"
 VALID_DATA="data/valid_temp.csv"
-TEST_DATA="data/test.csv"
+TEST_DATA="data/test_proc.csv"
 
 N_FOLDS=2
 TEST_SIZE=0.5

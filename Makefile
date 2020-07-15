@@ -1,4 +1,4 @@
-.PHONY: data train
+.PHONY: data train eval
 
 data:
 	## Download Data from S3
@@ -7,3 +7,7 @@ data:
 
 train:
 	python -m src.run -r --save-model
+
+eval:
+	python -m src.models.eval --square
+	python -m src.models.eval --dcnn

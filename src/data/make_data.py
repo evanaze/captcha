@@ -1,6 +1,9 @@
+""" This script makes the full processed training data.
+"""
 import os
 import numpy as np
 import warnings
+from concurrent.futures import ProcessPoolExecutor, as_completed
 
 import pandas as pd
 import cv2 as cv 
@@ -12,10 +15,6 @@ from skimage.io import imsave
 from .. import config
 from ..features.preprocess import preprocess
 
-""" This script makes the full processed training data.
-
-    The raw data must be placed in the input/raw directory.
-"""
 
 class MakeData:
     "This class ingests the raw data and creates the full training set."
@@ -34,9 +33,9 @@ class MakeData:
         X, y = self.df_all.filename, self.df_all.target - 1
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=config.TEST_SIZE, random_state=config.RAND_STATE, shuffle=True)
         self.df_train = pd.DataFrame({"filename": X_train, "target": y_train}).reset_index(drop=True)
-        df_test = pd.DataFrame({"filename": X_test, "target": y_test})
+        self.df_test = pd.DataFrame({"filename": X_test, "target": y_test}).reset_index(drop=True)
         self.df_train.to_csv("data/train.csv", index=False)
-        df_test.to_csv("data/test.csv", index=False)
+        self.df_test.to_csv("data/test.csv", index=False)
         self.df_all.to_csv("data/all.csv", index=False)
 
     def make_synthetic(self):
@@ -71,7 +70,7 @@ class MakeData:
         ).T
         # make the synthetic, processed data for each image
         for index, row in self.df_train.iterrows():
-            print(f"Processing image {index} of {m}", end="\r")
+            print(f"Train: processing image {index} of {m}", end="\r")
             target = row["target"]
             f_name = row["filename"]
             self.f_out = "img" + str(index) + "_" + str(target) + ".png"
@@ -80,6 +79,7 @@ class MakeData:
             self.make_synthetic()
             for i, img_loc in enumerate(self.imgs):
                 df_proc[4*index + i] = [img_loc, target, -1]
+        print(); print("Done.")
         # add the fold numbers
         kf = KFold(n_splits=config.N_FOLDS)
         df_proc = df_proc.T
@@ -89,9 +89,33 @@ class MakeData:
         # save to csv
         df_proc.to_csv("data/train_proc.csv", index=False)
 
+    def make_test_df(self):
+        "makes the processed test data"
+        m = len(self.df_test)
+        df_proc = pd.DataFrame(
+            columns=["filename", "target", "kfold"], 
+            index=range(4*m)
+        ).T
+        # make the synthetic, processed data for each image
+        for index, row in self.df_test.iterrows():
+            print(f"Test: processing image {index} of {m}", end="\r")
+            target = row["target"]
+            f_name = row["filename"]
+            self.f_out = "img" + str(index) + "_" + str(target) + ".png"
+            image_loc = os.path.join(config.RAW_DIR, f_name)
+            self.image = cv.imread(image_loc)
+            self.make_synthetic()
+            for i, img_loc in enumerate(self.imgs):
+                df_proc[4*index + i] = [img_loc, target, -1]
+        print(); print("Done.")
+        # save to csv
+        df_proc.T.to_csv("data/test_proc.csv", index=False)
+
     def main(self):
         self.split_train_test()
-        self.make_train_df()
+        with ProcessPoolExecutor(max_workers=2) as ppe:
+            futures = [ppe.submit(self.make_train_df()), 
+            ppe.submit(self.make_test_df())]
 
 
 if __name__ == "__main__":

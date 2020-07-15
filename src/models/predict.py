@@ -9,17 +9,17 @@ from ..features.preprocess import preprocess
 from .. import config
 
 
-def predict(file_name=None):
+def predict(data):
     "Predict on an image from a dataloader"
     # load the model
     model = Net()
     model.load_state_dict(torch.load("models/captcha_cnn_f0.pt"))
     model.eval()
     # get the output of the model
-    output = model() 
+    output = model(data.to("cpu")) 
     # choosing the model's result
     res = output.argmax(dim=1, keepdim=True).numpy()[0][0] + 1 
-    return true, res
+    return res
 
 def main():
     parser = argparse.ArgumentParser(description='Captcha evaluation')
