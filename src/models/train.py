@@ -26,7 +26,7 @@ from .. import config
 def run():
     # Training settings
     parser = argparse.ArgumentParser(description='PyTorch Captcha')
-    parser.add_argument('--epochs', type=int, default=14, metavar='N',
+    parser.add_argument('--epochs', type=int, default=10, metavar='N',
                         help='fnumber of epochs to train (default: 14)')
     parser.add_argument('--lr', type=float, default=1.0, metavar='LR',
                         help=f'learning rate (default: 1.0)')
@@ -48,7 +48,9 @@ def run():
     # where we store the training logs
     logs, log_name = {}, f"{datetime.now().isoformat()}.json"
     # the name of the model and where we store the models
-    models, model_name = {}, "captcha_cnn"
+    models, model_name = {}, "captcha_dcnn"
+    # add the model name to logs and the number of folds
+    logs["model"], logs["n_folds"] = model_name, config.N_FOLDS
     # perform K-fold CV
     for fold in range(config.N_FOLDS):
         print(f"Fold: {fold}")
@@ -97,7 +99,6 @@ def run():
             scheduler.step()
             # record the epoch result
             logs[str(datetime.now().time())] = {
-                "model": model_name,
                 "fold": fold,
                 "epoch": epoch,
                 "val_err": test_loss
@@ -105,13 +106,13 @@ def run():
         # save the final model state
         if args.save_model:
             torch.save(model.state_dict(), f"models/kFoldModels/{model_name}_{fold}.pt")
-    # save the logs
-    with open(f"logs/{log_name}", "w") as f:
-        json.dump(logs, f)
     # select the best model from the cross validation
     scores = np.array([(log['fold'], log['val_err']) for t, log in logs.items() if log['epoch'] == args.epochs])
     # select the best model by final val score
     best_model = np.argmax(scores[1])
+    # calculate the average validation error and add to log
+    avg_val_err = np.mean(scores[1])
+    logs["avg_val_err"] = avg_val_err
     # move model
     os.rename(f"models/kFoldModels/{model_name}_{best_model}.pt", f"models/{model_name}.pt")
     # delete the old model files
@@ -119,6 +120,8 @@ def run():
         for file in files:
             if file != ".gitkeep":
                 os.remove(os.path.join(root, file))
+    with open(f"logs/{log_name}", "w") as f:
+        json.dump(logs, f)
 
 
 if __name__ == '__main__':
