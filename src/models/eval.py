@@ -19,11 +19,13 @@ def eval_cv():
     df_all = pd.read_csv("data/all.csv")
     # make arrays to store the data
     y_pred, y_true = [0]*len(df_all), [0]*len(df_all)
+    print("Evaluating OpenCV method")
     print("Incorrect predictions: ")
     for index, row in df_all.iterrows():
+        # save the true value
         y_true[index] = row["target"]
-        f_name = row["filename"]
         # where the image is located
+        f_name = row["filename"]
         image_loc = os.path.join(config.RAW_DIR, f_name)
         # load the image
         image = cv.imread(image_loc)
@@ -35,7 +37,7 @@ def eval_cv():
     # return the result
     return precision_score(y_true, y_pred, average="micro")
 
-def dl():
+def eval_dl():
     """Evaluate the dl model on the test set"""
     # the test dataset
     eval_ds = CaptchaDataset(
@@ -48,13 +50,16 @@ def dl():
     # storing results
     y_true, y_pred = [0]*len(eval_ds), [0]*len(eval_ds)
     # evaluate the model on the test data
+    print("Evaluating DCNN")
     for i, (data, target) in tqdm(enumerate(eval_loader), total=len(eval_ds)):
-        res = predict(data)
-        y_true[i] = target
-        y_pred[i] = res
+        # save the prediction and the true value
+        y_true[i], y_pred[i] = target, predict(data)
+    # return the precision score
     return precision_score(y_true, y_pred, average="micro")
 
 
 if __name__ == "__main__":
-    score = dl()
-    print("Precision", score)
+    score1 = eval_cv()
+    score2 = eval_dl()
+    print("OpenCV precision:", score1)
+    print("DCNN precision:", score2)
