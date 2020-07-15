@@ -22,128 +22,114 @@ from .model import Net
 from .engine import train_fn, eval_fn
 from .. import config
 
-
-def train(args):
-    "Trains the model on the full training dataset"
-    # if we are using cuda
-    use_cuda = not args.no_cuda and torch.cuda.is_available()
-    # set the seet
-    torch.manual_seed(config.RAND_STATE)
-    # detect if we have a cuda device
-    device = torch.device("cuda" if use_cuda else "cpu")
-    # kwargs for training
-    kwargs = {'num_workers': 1, 'pin_memory': True} if use_cuda else {}
-    # the name of the model and where we store the models
-    model_name = "captcha_dcnn"
-    # train on the full training data
-    train = pd.read_csv("data/train_proc.csv")
-    # we just need the simplest transform
-    transform = transforms.ToTensor()
-    # the train and val loaders for this fold
-    train_ds = CaptchaDataset(
-        csv_file=config.TRAIN_ALL, 
-        root_dir=config.PROC_DIR, 
-        transform=transform
-    )
-    train_loader = DataLoader(
-        train_ds, 
-        batch_size=config.TRAIN_BATCH_SIZE, 
-        shuffle=True, 
-        **kwargs
-    )
-    # load the model onto the device
-    model = Net().to(device)
-    # initialize Ada optimizer
-    optimizer = optim.Adadelta(model.parameters(), lr=args.lr)
-    # initialize the scheduler
-    scheduler = StepLR(optimizer, step_size=1, gamma=args.gamma)
-    # loop through epochs
-    for epoch in range(1, args.epochs + 1):
-        # perform the training passthrough
-        train_loss = train_fn(model, device, train_loader, optimizer, epoch)
-        # scheduler step
-        scheduler.step()
-    # save the final model state
-    torch.save(model.state_dict(), f"models/{model_name}.pt")
-
-
-def kFoldCV(args):
-    "Performs KFold CV to estimate the generalization score"
-    # if we are using cuda
-    use_cuda = not args.no_cuda and torch.cuda.is_available()
-    # set the seet
-    torch.manual_seed(config.RAND_STATE)
-    # detect if we have a cuda device
-    device = torch.device("cuda" if use_cuda else "cpu")
-    # kwargs for training
-    kwargs = {'num_workers': 1, 'pin_memory': True} if use_cuda else {}
-    # where we store the training logs
-    logs, log_name = {}, f"{datetime.now().isoformat()}.json"
-    # the name of the model and where we store the models
-    models, model_name = {}, "captcha_dcnn"
-    # add the model name to logs and the number of folds
-    logs["model"], logs["n_folds"] = model_name, config.N_FOLDS
-    # perform K-fold CV
-    for fold in range(config.N_FOLDS):
-        print(f"Fold: {fold}")
-        # split data into folds
-        train = pd.read_csv("data/train_proc.csv")
-        train[train.kfold != fold].to_csv("data/train_temp.csv", index=False)
-        train[train.kfold == fold].to_csv("data/valid_temp.csv", index=False)
+class Train:
+    def __init__(self, args):
+        self.args = args
+        # choosing device
+        self.use_cuda = not self.args.no_cuda and torch.cuda.is_available()
+        # set the seed
+        torch.manual_seed(config.RAND_STATE)
+        # detect if we have a cuda device
+        self.device = torch.device("cuda" if self.use_cuda else "cpu")
+        # kwargs for training
+        self.kwargs = {'num_workers': 1, 'pin_memory': True} if self.use_cuda else {}
+        # the name of the model and where we store the models
+        self.model_name = "captcha_dcnn"
         # we just need the simplest transform
-        transform = transforms.ToTensor()
+        self.transform = transforms.ToTensor()
+        self.model = Net().to(device)
+        # initialize Ada optimizer
+        self.optimizer = optim.Adadelta(model.parameters(), lr=self.args.lr)
+        # initialize the scheduler
+        self.scheduler = StepLR(optimizer, step_size=1, gamma=self.args.gamma)
+
+
+    def full_model(self):
+        "Trains the model on the full training dataset"
+        # train on the full training data
+        train = pd.read_csv("data/train_proc.csv")
         # the train and val loaders for this fold
         train_ds = CaptchaDataset(
-            csv_file=config.TRAIN_DATA, 
+            csv_file=config.TRAIN_ALL, 
             root_dir=config.PROC_DIR, 
-            transform=transform
-        )
-        valid_ds = CaptchaDataset(
-            csv_file=config.VALID_DATA, 
-            root_dir=config.PROC_DIR, 
-            transform=transform
+            transform=self.transform
         )
         train_loader = DataLoader(
             train_ds, 
             batch_size=config.TRAIN_BATCH_SIZE, 
             shuffle=True, 
-            **kwargs
+            **self.kwargs
         )
-        valid_loader = DataLoader(
-            valid_ds, 
-            batch_size=config.VALID_BATCH_SIZE, 
-            shuffle=True, 
-            **kwargs
-        )
-        # load the model onto the device
-        model = Net().to(device)
-        # initialize Ada optimizer
-        optimizer = optim.Adadelta(model.parameters(), lr=args.lr)
-        # initialize the scheduler
-        scheduler = StepLR(optimizer, step_size=1, gamma=args.gamma)
         # loop through epochs
-        for epoch in range(1, args.epochs + 1):
+        for epoch in range(1, self.args.epochs + 1):
             # perform the training passthrough
-            train_loss = train_fn(model, device, train_loader, optimizer, epoch)
-            # record the test loss
-            test_loss = eval_fn(model, device, valid_loader)
+            train_loss = train_fn(self.model, self.device, train_loader, self.optimizer, epoch)
             # scheduler step
-            scheduler.step()
-            # record the epoch result
-            logs[str(datetime.now().time())] = {
-                "fold": fold,
-                "epoch": epoch,
-                "val_err": test_loss
-            }
-    # select the best model from the cross validation
-    scores = np.array([(log['fold'], log['val_err']) for t, log in logs.items() if log['epoch'] == args.epochs])
-    # calculate the average validation error and add to log
-    avg_val_err = np.mean(scores[1])
-    logs["avg_val_err"] = avg_val_err
-    print("Average Validation Error:", avg_val_err)
-    # delete the old model files
-    with open(f"logs/{log_name}", "w") as f:
-        json.dump(logs, f)
+            self.scheduler.step()
+        # save the final model state
+        torch.save(self.model.state_dict(), f"models/{self.model_name}.pt")
+
+
+    def kfold_cv(self):
+        "Performs KFold CV to estimate the generalization score"
+        # where we store the training logs
+        logs, log_name = {}, f"{datetime.now().isoformat()}.json"
+        # add the model name to logs and the number of folds
+        logs["model"], logs["n_folds"] = self.model_name, config.N_FOLDS
+        # perform K-fold CV
+        for fold in range(config.N_FOLDS):
+            print(f"Fold: {fold}")
+            # split data into folds
+            train = pd.read_csv("data/train_proc.csv")
+            train[train.kfold != fold].to_csv("data/train_temp.csv", index=False)
+            train[train.kfold == fold].to_csv("data/valid_temp.csv", index=False)
+            # the train and val loaders for this fold
+            train_ds = CaptchaDataset(
+                csv_file=config.TRAIN_DATA, 
+                root_dir=config.PROC_DIR, 
+                transform=self.transform
+            )
+            valid_ds = CaptchaDataset(
+                csv_file=config.VALID_DATA, 
+                root_dir=config.PROC_DIR, 
+                transform=self.transform
+            )
+            train_loader = DataLoader(
+                train_ds, 
+                batch_size=config.TRAIN_BATCH_SIZE, 
+                shuffle=True, 
+                **self.kwargs
+            )
+            valid_loader = DataLoader(
+                valid_ds, 
+                batch_size=config.VALID_BATCH_SIZE, 
+                shuffle=True, 
+                **self.kwargs
+            )
+            # loop through epochs
+            for epoch in range(1, self.args.epochs + 1):
+                # perform the training passthrough
+                train_loss = train_fn(self.model, self.device, train_loader, self.optimizer, epoch)
+                # record the test loss
+                test_loss = eval_fn(self.model, self.device, valid_loader)
+                # scheduler step
+                self.scheduler.step()
+                # record the epoch result
+                logs[str(datetime.now().time())] = {
+                    "fold": fold,
+                    "epoch": epoch,
+                    "val_err": test_loss
+                }
+        # select the best model from the cross validation
+        scores = np.array([(log['fold'], log['val_err']) for t, log 
+        in logs.items() if log['epoch'] == self.args.epochs])
+        # calculate the average validation error and add to log
+        avg_val_err = np.mean(scores[1])
+        logs["avg_val_err"] = avg_val_err
+        print("Average Validation Error:", avg_val_err)
+        # delete the old model files
+        with open(f"logs/{log_name}", "w") as f:
+            json.dump(logs, f)
 
 
 def run():
@@ -160,11 +146,14 @@ def run():
     parser.add_argument('--full-model', action='store_true', default=False,
                         help='For Saving the current Model')
     args = parser.parse_args()
-
+    # the train object
+    t = Train(args)
+    # whether to train on the full training data
     if args.full_model:
-        train(args)
+        t.full_model()
     else:
-        kFoldCV(args)
+        t.kfold_cv()
+
 
 if __name__ == '__main__':
     run()
