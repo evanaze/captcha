@@ -12,22 +12,34 @@ from .. import config
 
 
 def n_squares(image, display=False):
+    # perform prerprocessing for the input image
     image = preprocess(image)
+    # optionally display the processed image
     if display:
         cv.imshow("input image", image)
         cv.waitKey()
+    # find contours
     cnts = cv.findContours(image.copy(), cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
+    # interpred OpenCV's contours
     cnts = imutils.grab_contours(cnts)
+    # load our shape detector object
     sd = ShapeDetector()
+    # the number of squares we count
     n_squares = 0
+    # iterate through the list of contours
     for c in cnts:
         # compute the center of the contour 
         M = cv.moments(c)
+        # the area of the contour
         a = M["m00"]
+        # require that the contour be greater than 50 pix
         if a < 50:
             continue
+        # detect the shape
         shape, bb_area = sd.detect(c)
+        # how square our shape is
         diff = bb_area - a
+        # optionally display the bounding boxes and countours
         if display:
             print(a, diff, shape)
             cX = int(M["m10"] / M["m00"])

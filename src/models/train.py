@@ -5,8 +5,10 @@
 from __future__ import print_function, absolute_import
 import argparse
 import json
+import os
 from datetime import datetime
 
+import numpy as np
 import pandas as pd
 import torch
 import torch.optim as optim
@@ -91,7 +93,9 @@ def run():
             train_loss = train_fn(model, device, train_loader, optimizer, epoch)
             # record the test loss
             test_loss = eval_fn(model, device, valid_loader)
+            # scheduler step
             scheduler.step()
+            # record the epoch result
             logs[str(datetime.now().time())] = {
                 "model": model_name,
                 "fold": fold,
@@ -99,17 +103,22 @@ def run():
                 "val_err": test_loss
             }
         # save the final model state
-        models[fold] = state_dict()
-    # save the 
+        if args.save_model:
+            torch.save(model.state_dict(), f"models/kFoldModels/{model_name}_{fold}.pt")
+    # save the logs
     with open(f"logs/{log_name}", "w") as f:
         json.dump(logs, f)
     # select the best model from the cross validation
     scores = np.array([(log['fold'], log['val_err']) for t, log in logs.items() if log['epoch'] == args.epochs])
     # select the best model by final val score
     best_model = np.argmax(scores[1])
-    # save the model
-    if args.save_model:
-        torch.save(models[best_model].state_dict(), f"models/{model_name}.pt")
+    # move model
+    os.rename(f"models/kFoldModels/{model_name}_{best_model}.pt", f"models/{model_name}.pt")
+    # delete the old model files
+    for root, dirs, files in os.walk("models/kFoldModels"):
+        for file in files:
+            if file != ".gitkeep":
+                os.remove(os.path.join(root, file))
 
 
 if __name__ == '__main__':

@@ -154,3 +154,5 @@ logs/*.json
 # models
 models/*
 !models/.gitkeep
+models/kFoldModels/*
+!models/kFoldModels/.gitkeep
