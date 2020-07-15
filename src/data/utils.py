@@ -1,7 +1,6 @@
 """ ### Utilities
     A rather bare script, just for labeling new images if you have them.
 """
-
 import os
 from skimage import io
 import pandas as pd
