@@ -23,20 +23,52 @@ from .engine import train_fn, eval_fn
 from .. import config
 
 
-def run():
-    # Training settings
-    parser = argparse.ArgumentParser(description='PyTorch Captcha')
-    parser.add_argument('--epochs', type=int, default=10, metavar='N',
-                        help='fnumber of epochs to train (default: 14)')
-    parser.add_argument('--lr', type=float, default=1.0, metavar='LR',
-                        help=f'learning rate (default: 1.0)')
-    parser.add_argument('--gamma', type=float, default=0.7, metavar='M',
-                        help='Learning rate step gamma (default: 0.7)')
-    parser.add_argument('--no-cuda', action='store_true', default=False,
-                        help='disables CUDA training')
-    parser.add_argument('--save-model', action='store_true', default=False,
-                        help='For Saving the current Model')
-    args = parser.parse_args()
+def train(args):
+    "Trains the model on the full training dataset"
+    # if we are using cuda
+    use_cuda = not args.no_cuda and torch.cuda.is_available()
+    # set the seet
+    torch.manual_seed(config.RAND_STATE)
+    # detect if we have a cuda device
+    device = torch.device("cuda" if use_cuda else "cpu")
+    # kwargs for training
+    kwargs = {'num_workers': 1, 'pin_memory': True} if use_cuda else {}
+    # the name of the model and where we store the models
+    model_name = "captcha_dcnn"
+    # train on the full training data
+    train = pd.read_csv("data/train_proc.csv")
+    # we just need the simplest transform
+    transform = transforms.ToTensor()
+    # the train and val loaders for this fold
+    train_ds = CaptchaDataset(
+        csv_file=config.TRAIN_ALL, 
+        root_dir=config.PROC_DIR, 
+        transform=transform
+    )
+    train_loader = DataLoader(
+        train_ds, 
+        batch_size=config.TRAIN_BATCH_SIZE, 
+        shuffle=True, 
+        **kwargs
+    )
+    # load the model onto the device
+    model = Net().to(device)
+    # initialize Ada optimizer
+    optimizer = optim.Adadelta(model.parameters(), lr=args.lr)
+    # initialize the scheduler
+    scheduler = StepLR(optimizer, step_size=1, gamma=args.gamma)
+    # loop through epochs
+    for epoch in range(1, args.epochs + 1):
+        # perform the training passthrough
+        train_loss = train_fn(model, device, train_loader, optimizer, epoch)
+        # scheduler step
+        scheduler.step()
+    # save the final model state
+    torch.save(model.state_dict(), f"models/{model_name}.pt")
+
+
+def kFoldCV(args):
+    "Performs KFold CV to estimate the generalization score"
     # if we are using cuda
     use_cuda = not args.no_cuda and torch.cuda.is_available()
     # set the seet
@@ -103,26 +135,36 @@ def run():
                 "epoch": epoch,
                 "val_err": test_loss
             }
-        # save the final model state
-        if args.save_model:
-            torch.save(model.state_dict(), f"models/kFoldModels/{model_name}_{fold}.pt")
     # select the best model from the cross validation
     scores = np.array([(log['fold'], log['val_err']) for t, log in logs.items() if log['epoch'] == args.epochs])
-    # select the best model by final val score
-    best_model = np.argmax(scores[1])
     # calculate the average validation error and add to log
     avg_val_err = np.mean(scores[1])
     logs["avg_val_err"] = avg_val_err
-    # move model
-    os.rename(f"models/kFoldModels/{model_name}_{best_model}.pt", f"models/{model_name}.pt")
+    print("Average Validation Error:", avg_val_err)
     # delete the old model files
-    for root, dirs, files in os.walk("models/kFoldModels"):
-        for file in files:
-            if file != ".gitkeep":
-                os.remove(os.path.join(root, file))
     with open(f"logs/{log_name}", "w") as f:
         json.dump(logs, f)
 
+
+def run():
+    # Training settings
+    parser = argparse.ArgumentParser(description='PyTorch Captcha')
+    parser.add_argument('--epochs', type=int, default=10, metavar='N',
+                        help='fnumber of epochs to train (default: 14)')
+    parser.add_argument('--lr', type=float, default=1.0, metavar='LR',
+                        help=f'learning rate (default: 1.0)')
+    parser.add_argument('--gamma', type=float, default=0.7, metavar='M',
+                        help='Learning rate step gamma (default: 0.7)')
+    parser.add_argument('--no-cuda', action='store_true', default=False,
+                        help='disables CUDA training')
+    parser.add_argument('--full-model', action='store_true', default=False,
+                        help='For Saving the current Model')
+    args = parser.parse_args()
+
+    if args.full_model:
+        train(args)
+    else:
+        kFoldCV(args)
 
 if __name__ == '__main__':
     run()

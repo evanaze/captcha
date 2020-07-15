@@ -103,7 +103,7 @@ class MakeData:
         "makes the processed test data"
         m = len(self.df_test)
         df_proc = pd.DataFrame(
-            columns=["filename", "target", "kfold"], 
+            columns=["filename", "target"], 
             index=range(4*m)
         ).T
         # make the synthetic, processed data for each image
@@ -121,7 +121,7 @@ class MakeData:
             self.make_synthetic()
             # rotate the images
             for i, img_loc in enumerate(self.imgs):
-                df_proc[4*index + i] = [img_loc, target, -1]
+                df_proc[4*index + i] = [img_loc, target]
         print(); print("Done.")
         # save to csv
         df_proc.T.to_csv("data/test_proc.csv", index=False)
