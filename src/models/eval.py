@@ -58,7 +58,6 @@ def eval_dl(model="models/captcha_cnn_f0.pt"):
     for i, (data, target) in tqdm(enumerate(eval_loader), total=len(eval_ds)):
         # save the prediction and the true value
         y_true[i], y_pred[i] = target, predict(data, model)
-        print("True:", y_true[i], "Predicted:", y_pred[i])
     # return the precision score
     return precision_score(y_true, y_pred, average="micro")
 
