@@ -74,8 +74,6 @@ class Train:
         "Performs KFold CV to estimate the generalization score"
         # where we store the training logs
         logs, log_name = {}, f"{datetime.now().isoformat()}.json"
-        # add the model name to logs and the number of folds
-        logs["model"], logs["n_folds"] = self.model_name, config.N_FOLDS
         # perform K-fold CV
         for fold in range(config.N_FOLDS):
             print(f"Fold: {fold}")
@@ -117,23 +115,27 @@ class Train:
                 # perform the training passthrough
                 train_loss = train_fn(model, self.device, train_loader, optimizer, epoch)
                 # record the test loss
-                test_loss = eval_fn(model, self.device, valid_loader)
+                test_loss, pct_correct = eval_fn(model, self.device, valid_loader)
                 # scheduler step
                 scheduler.step()
                 # record the epoch result
                 logs[str(datetime.now().time())] = {
                     "fold": fold,
                     "epoch": epoch,
-                    "val_err": test_loss
+                    "val_err": test_loss,
+                    "pct_correct": pct_correct
                 }
-        # select the best model from the cross validation
-        scores = np.array([(log['fold'], log['val_err']) for t, log 
-        in logs.items() if log['epoch'] == self.args.epochs])
-        # calculate the average validation error and add to log
-        avg_val_err = np.mean(scores[1])
-        logs["avg_val_err"] = avg_val_err
+        # find the models and their validation scores
+        scores = np.array([(log['fold'], log['val_err'], log['pct_correct']) for t, log in logs.items() if log['epoch'] == self.args.epochs])
+        # calculate the average validation error and precision
+        avg_val_err, avg_pct_corr = np.mean(scores[1]), np.mean(scores[2])
+        # add to log
+        logs["avg_val_err"], logs["avg_pct_correct"] = avg_val_err, avg_pct_corr
         print("Average Validation Error:", avg_val_err)
-        # delete the old model files
+        print("Average Precision:", avg_pct_corr)
+        # add the model name to logs and the number of folds
+        logs["model"], logs["n_folds"] = self.model_name, config.N_FOLDS
+        # dump the log
         with open(f"logs/{log_name}", "w") as f:
             json.dump(logs, f)
 

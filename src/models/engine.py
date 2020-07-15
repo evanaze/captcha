@@ -41,6 +41,6 @@ def eval_fn(model, device, data_loader):
     print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
         test_loss, correct, len(data_loader.dataset),
         100. * correct / len(data_loader.dataset)))
-    return test_loss
+    return test_loss, 100. * correct / len(data_loader.dataset)
 
     
