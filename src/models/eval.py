@@ -21,8 +21,7 @@ def eval_cv():
     # make arrays to store the data
     y_pred, y_true = [0]*len(df_all), [0]*len(df_all)
     print("Evaluating OpenCV method")
-    print("Incorrect predictions: ")
-    for index, row in df_all.iterrows():
+    for index, row in tqdm(df_all.iterrows(), total=len(df_all)):
         # save the true value
         true = row["target"]
         y_true[index] = true
@@ -34,14 +33,11 @@ def eval_cv():
         # save the openCV prediction
         pred = n_squares(image)
         y_pred[index] = pred
-        # print
-        if pred != true:
-            print("\t", pred, image_loc)
     # return the result
     return precision_score(y_true, y_pred, average="micro")
 
 
-def eval_dl(model="models/captcha_cnn_f0.pt"):
+def eval_dl(model="models/captcha_dcnn.pt"):
     """Evaluate the dl model on the test set"""
     # the test dataset
     eval_ds = CaptchaDataset(
