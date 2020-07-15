@@ -40,6 +40,7 @@ class CaptchaDataset(Dataset):
 
 
 if __name__ == "__main__":
+    "For viewing a couple of the images"
     captcha_dataset = CaptchaDataset(csv_file=config.TRAIN_DATA,
                                      root_dir=config.PROC_DIR)
 

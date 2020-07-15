@@ -58,30 +58,28 @@ def eval_dl(model="models/captcha_cnn_f0.pt"):
     for i, (data, target) in tqdm(enumerate(eval_loader), total=len(eval_ds)):
         # save the prediction and the true value
         y_true[i], y_pred[i] = target, predict(data, model)
+        print("True:", y_true[i], "Predicted:", y_pred[i])
     # return the precision score
     return precision_score(y_true, y_pred, average="micro")
 
 
-    def main():
-        """Uses argparse to intelligently run eval"""
-        parser = argparse.ArgumentParser(description='Captcha evaluation')
-        parser.add_argument('--square', '-s', store_true=True,
-                        help='whether or not to evaluate the OpenCV method')
-        parser.add_argument('--dcnn', '-d', store_true=True,
-                        help='evaluate the DCNN model')
-        args = parser.parse_args()
-        # if we should evaluate the opencv model
-        if args.square:
-            score = eval_cv()
-            print("OpenCV precision:", score)
-        # if we should evaluate the dcnn model
-        if args.dcnn:
-            score = eval_dl()
-            print("DCNN precision:", score)
+def main():
+    """Uses argparse to intelligently run eval"""
+    parser = argparse.ArgumentParser(description='Captcha evaluation')
+    parser.add_argument('--square', '-s', action='store_true',
+                    help='whether or not to evaluate the OpenCV method')
+    parser.add_argument('--dcnn', '-d', action='store_true',
+                    help='evaluate the DCNN model')
+    args = parser.parse_args()
+    # if we should evaluate the opencv model
+    if args.square:
+        score = eval_cv()
+        print("OpenCV precision:", score)
+    # if we should evaluate the dcnn model
+    if args.dcnn:
+        score = eval_dl()
+        print("DCNN precision:", score)
 
 
 if __name__ == "__main__":
-    score1 = eval_cv()
-    score2 = eval_dl()
-    print("OpenCV precision:", score1)
-    print("DCNN precision:", score2)
+    main()

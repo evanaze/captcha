@@ -73,10 +73,15 @@ class MakeData:
             print(f"Train: processing image {index} of {m}", end="\r")
             target = row["target"]
             f_name = row["filename"]
+            # the name of the processed image
             self.f_out = "img" + str(index) + "_" + str(target) + ".png"
+            # where to store the output image
             image_loc = os.path.join(config.RAW_DIR, f_name)
+            # read the image
             self.image = cv.imread(image_loc)
+            # generate synthetic data
             self.make_synthetic()
+            # rotate the images
             for i, img_loc in enumerate(self.imgs):
                 df_proc[4*index + i] = [img_loc, target, -1]
         print(); print("Done.")
@@ -101,10 +106,15 @@ class MakeData:
             print(f"Test: processing image {index} of {m}", end="\r")
             target = row["target"]
             f_name = row["filename"]
+            # the name of the processed image
             self.f_out = "img" + str(index) + "_" + str(target) + ".png"
+            # where to store the output image
             image_loc = os.path.join(config.RAW_DIR, f_name)
+            # read the image
             self.image = cv.imread(image_loc)
+            # generate synthetic data
             self.make_synthetic()
+            # rotate the images
             for i, img_loc in enumerate(self.imgs):
                 df_proc[4*index + i] = [img_loc, target, -1]
         print(); print("Done.")
