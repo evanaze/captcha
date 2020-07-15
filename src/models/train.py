@@ -34,25 +34,29 @@ def run():
                         help='disables CUDA training')
     parser.add_argument('--save-model', action='store_true', default=False,
                         help='For Saving the current Model')
-
     args = parser.parse_args()
+    # if we are using cuda
     use_cuda = not args.no_cuda and torch.cuda.is_available()
-
+    # set the seet
     torch.manual_seed(config.RAND_STATE)
-
+    # detect if we have a cuda device
     device = torch.device("cuda" if use_cuda else "cpu")
-
+    # kwargs for training
     kwargs = {'num_workers': 1, 'pin_memory': True} if use_cuda else {}
-
-    log = {}
-
+    # where we store the training logs
+    logs, log_name = {}, f"{datetime.now().isoformat()}.json"
+    # the name of the model and where we store the models
+    models, model_name = {}, "captcha_cnn"
+    # perform K-fold CV
     for fold in range(config.N_FOLDS):
         print(f"Fold: {fold}")
         # split data into folds
         train = pd.read_csv("data/train_proc.csv")
         train[train.kfold != fold].to_csv("data/train_temp.csv", index=False)
         train[train.kfold == fold].to_csv("data/valid_temp.csv", index=False)
+        # we just need the simplest transform
         transform = transforms.ToTensor()
+        # the train and val loaders for this fold
         train_ds = CaptchaDataset(
             csv_file=config.TRAIN_DATA, 
             root_dir=config.PROC_DIR, 
@@ -75,25 +79,37 @@ def run():
             shuffle=True, 
             **kwargs
         )
-
+        # load the model onto the device
         model = Net().to(device)
-        model_name = "captcha_cnn"
+        # initialize Ada optimizer
         optimizer = optim.Adadelta(model.parameters(), lr=args.lr)
+        # initialize the scheduler
         scheduler = StepLR(optimizer, step_size=1, gamma=args.gamma)
+        # loop through epochs
         for epoch in range(1, args.epochs + 1):
+            # perform the training passthrough
             train_loss = train_fn(model, device, train_loader, optimizer, epoch)
+            # record the test loss
             test_loss = eval_fn(model, device, valid_loader)
             scheduler.step()
-            log[str(datetime.now().time())] = {
+            logs[str(datetime.now().time())] = {
                 "model": model_name,
                 "fold": fold,
                 "epoch": epoch,
                 "val_err": test_loss
             }
-        with open(f"logs/{datetime.now()}.json", "w") as f:
-            json.dump(log, f)
-        if args.save_model:
-            torch.save(model.state_dict(), f"models/{model_name}_f{fold}.pt")
+        # save the final model state
+        models[fold] = state_dict()
+    # save the 
+    with open(f"logs/{log_name}", "w") as f:
+        json.dump(logs, f)
+    # select the best model from the cross validation
+    scores = np.array([(log['fold'], log['val_err']) for t, log in logs.items() if log['epoch'] == args.epochs])
+    # select the best model by final val score
+    best_model = np.argmax(scores[1])
+    # save the model
+    if args.save_model:
+        torch.save(models[best_model].state_dict(), f"models/{model_name}.pt")
 
 
 if __name__ == '__main__':
