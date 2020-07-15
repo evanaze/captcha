@@ -1,6 +1,4 @@
 """ Runs the engine to implement model training.
-
-    Only has one method: run() to perform the model training
 """
 from __future__ import print_function, absolute_import
 import argparse
@@ -22,6 +20,7 @@ from .model import Net
 from .engine import train_fn, eval_fn
 from .. import config
 
+
 class Train:
     def __init__(self, args):
         self.args = args
@@ -37,11 +36,6 @@ class Train:
         self.model_name = "captcha_dcnn"
         # we just need the simplest transform
         self.transform = transforms.ToTensor()
-        self.model = Net().to(self.device)
-        # initialize Ada optimizer
-        self.optimizer = optim.Adadelta(self.model.parameters(), lr=self.args.lr)
-        # initialize the scheduler
-        self.scheduler = StepLR(self.optimizer, step_size=1, gamma=self.args.gamma)
 
 
     def full_model(self):
@@ -60,14 +54,20 @@ class Train:
             shuffle=True, 
             **self.kwargs
         )
+        # initialize the model
+        model = Net().to(self.device)
+        # initialize Ada optimizer
+        optimizer = optim.Adadelta(model.parameters(), lr=self.args.lr)
+        # initialize the scheduler
+        scheduler = StepLR(optimizer, step_size=1, gamma=self.args.gamma)
         # loop through epochs
         for epoch in range(1, self.args.epochs + 1):
             # perform the training passthrough
-            train_loss = train_fn(self.model, self.device, train_loader, self.optimizer, epoch)
+            train_loss = train_fn(model, self.device, train_loader, optimizer, epoch)
             # scheduler step
-            self.scheduler.step()
+            scheduler.step()
         # save the final model state
-        torch.save(self.model.state_dict(), f"models/{self.model_name}.pt")
+        torch.save(model.state_dict(), f"models/{self.model_name}.pt")
 
 
     def kfold_cv(self):
@@ -106,14 +106,20 @@ class Train:
                 shuffle=True, 
                 **self.kwargs
             )
+            # initialize the model
+            model = Net().to(self.device)
+            # initialize Ada optimizer
+            optimizer = optim.Adadelta(model.parameters(), lr=self.args.lr)
+            # initialize the scheduler
+            scheduler = StepLR(optimizer, step_size=1, gamma=self.args.gamma)
             # loop through epochs
             for epoch in range(1, self.args.epochs + 1):
                 # perform the training passthrough
-                train_loss = train_fn(self.model, self.device, train_loader, self.optimizer, epoch)
+                train_loss = train_fn(model, self.device, train_loader, optimizer, epoch)
                 # record the test loss
-                test_loss = eval_fn(self.model, self.device, valid_loader)
+                test_loss = eval_fn(model, self.device, valid_loader)
                 # scheduler step
-                self.scheduler.step()
+                scheduler.step()
                 # record the epoch result
                 logs[str(datetime.now().time())] = {
                     "fold": fold,
