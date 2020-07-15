@@ -2,6 +2,7 @@
 import os
 from tqdm import tqdm
 import pandas as pd
+import argparse
 import cv2 as cv 
 from torchvision import transforms
 from torch.utils.data import DataLoader
@@ -23,21 +24,24 @@ def eval_cv():
     print("Incorrect predictions: ")
     for index, row in df_all.iterrows():
         # save the true value
-        y_true[index] = row["target"]
+        true = row["target"]
+        y_true[index] = true
         # where the image is located
         f_name = row["filename"]
         image_loc = os.path.join(config.RAW_DIR, f_name)
         # load the image
         image = cv.imread(image_loc)
         # save the openCV prediction
-        y_pred[index] = n_squares(image)
+        pred = n_squares(image)
+        y_pred[index] = pred
         # print
         if pred != true:
             print("\t", pred, image_loc)
     # return the result
     return precision_score(y_true, y_pred, average="micro")
 
-def eval_dl():
+
+def eval_dl(model="models/captcha_cnn_f0.pt"):
     """Evaluate the dl model on the test set"""
     # the test dataset
     eval_ds = CaptchaDataset(
@@ -53,9 +57,26 @@ def eval_dl():
     print("Evaluating DCNN")
     for i, (data, target) in tqdm(enumerate(eval_loader), total=len(eval_ds)):
         # save the prediction and the true value
-        y_true[i], y_pred[i] = target, predict(data)
+        y_true[i], y_pred[i] = target, predict(data, model)
     # return the precision score
     return precision_score(y_true, y_pred, average="micro")
+
+
+    def main():
+        """Uses argparse to intelligently run eval"""
+        parser = argparse.ArgumentParser(description='Captcha evaluation')
+        parser.add_argument('--square', '-s', store_true=True,
+                        help='whether or not to evaluate the OpenCV method')
+        parser.add_argument('--dcnn', '-d', store_true=True,
+                        help='evaluate the DCNN model')
+        args = parser.parse_args()
+
+        if args.square:
+            score = eval_cv()
+            print("OpenCV precision:", score)
+        if args.dcnn:
+            score = eval_dl()
+            print("DCNN precision:", score)
 
 
 if __name__ == "__main__":

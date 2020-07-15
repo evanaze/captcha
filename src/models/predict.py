@@ -1,4 +1,4 @@
-""" The overall predict script for the full model
+""" Predicts for a processed image
 """
 import os
 import argparse
@@ -9,7 +9,7 @@ from ..features.preprocess import preprocess
 from .. import config
 
 
-def predict(data, model_loc="models/captcha_cnn_f0.pt"):
+def predict(data, model_loc):
     "Predict on an image from a dataloader"
     # load the model
     model = Net()

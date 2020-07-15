@@ -9,5 +9,4 @@ train:
 	python -m src.run -r --save-model
 
 eval:
-	python -m src.models.eval --square
-	python -m src.models.eval --dcnn
+	python -m src.models.eval --square --dcnn
