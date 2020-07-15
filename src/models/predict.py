@@ -9,11 +9,12 @@ from ..features.preprocess import preprocess
 from .. import config
 
 
-def predict(data):
+def predict(data, model_loc="models/captcha_cnn_f0.pt"):
     "Predict on an image from a dataloader"
     # load the model
     model = Net()
-    model.load_state_dict(torch.load("models/captcha_cnn_f0.pt"))
+    model.load_state_dict(torch.load(model_loc))
+    # set the model to eval state
     model.eval()
     # get the output of the model
     output = model(data.to("cpu")) 

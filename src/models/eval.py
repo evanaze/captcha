@@ -17,17 +17,21 @@ def eval_cv():
     "Evaluates the square counting method on the full data"
     # read in the full data
     df_all = pd.read_csv("data/all.csv")
-    y_pred, y_true = [], []
+    # make arrays to store the data
+    y_pred, y_true = [0]*len(df_all), [0]*len(df_all)
+    print("Incorrect predictions: ")
     for index, row in df_all.iterrows():
-        true = row["target"]
-        y_true.append(true)
+        y_true[index] = row["target"]
         f_name = row["filename"]
+        # where the image is located
         image_loc = os.path.join(config.RAW_DIR, f_name)
+        # load the image
         image = cv.imread(image_loc)
-        pred = n_squares(image)
-        y_pred.append(pred)
+        # save the openCV prediction
+        y_pred[index] = n_squares(image)
+        # print
         if pred != true:
-            print(pred, image_loc)
+            print("\t", pred, image_loc)
     # return the result
     return precision_score(y_true, y_pred, average="micro")
 
