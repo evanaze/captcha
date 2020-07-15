@@ -128,7 +128,7 @@ class Train:
         # find the models and their validation scores
         scores = np.array([(log['fold'], log['val_err'], log['pct_correct']) for t, log in logs.items() if log['epoch'] == self.args.epochs])
         # calculate the average validation error and precision
-        avg_val_err, avg_pct_corr = np.mean(scores[1]), np.mean(scores[2])
+        avg_val_err, avg_pct_corr = np.mean(scores[:,1]), np.mean(scores[:,2])
         # add to log
         logs["avg_val_err"], logs["avg_pct_correct"] = avg_val_err, avg_pct_corr
         print("Average Validation Error:", avg_val_err)
