@@ -1,8 +1,8 @@
 """The full eval script."""
 import os
+import argparse
 from tqdm import tqdm
 import pandas as pd
-import argparse
 import cv2 as cv 
 from torchvision import transforms
 from torch.utils.data import DataLoader

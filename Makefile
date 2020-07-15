@@ -1,4 +1,4 @@
-.PHONY: data train eval clean
+.PHONY: data train eval clean cross_val
 
 data:
 	# downloads the data from s3 and runs data processing
@@ -9,6 +9,10 @@ train:
 	# trains on the full test data with the default settings
 	python -m src.models.train --full-model
 
+cross_val:
+	# performs kfold cross validation
+	python -m src.models.train
+	
 eval:
 	# evaluates OpenCV and Deep Learning Methods
 	python -m src.models.eval --square --dcnn
