@@ -23,6 +23,7 @@ class MakeData:
         self.files = [f for f in self.files if not f.startswith('.')]
         self.n = len(self.files)
 
+
     def split_train_test(self):
         filenames, targets = [0]*self.n, np.empty(self.n, dtype=int)
         for idx, f in enumerate(self.files):
@@ -37,6 +38,7 @@ class MakeData:
         self.df_train.to_csv("data/train.csv", index=False)
         self.df_test.to_csv("data/test.csv", index=False)
         self.df_all.to_csv("data/all.csv", index=False)
+
 
     def make_synthetic(self):
         "Make 4 copies of the processed image"
@@ -60,6 +62,7 @@ class MakeData:
                 warnings.simplefilter("ignore")
                 imsave(img_loc, img)
             self.imgs[i] = img_name
+
 
     def make_train_df(self):
         "Turn the train split into processed data."
@@ -87,12 +90,14 @@ class MakeData:
         print(); print("Done.")
         # add the fold numbers
         kf = KFold(n_splits=config.N_FOLDS)
+        # we want the transpose
         df_proc = df_proc.T
         X_proc = df_proc["filename"]; y_proc = df_proc["target"]
         for fold, (train_idx, val_idx) in enumerate(kf.split(X=X_proc, y=y_proc)):
             df_proc.loc[val_idx, 'kfold'] = fold
         # save to csv
         df_proc.to_csv("data/train_proc.csv", index=False)
+
 
     def make_test_df(self):
         "makes the processed test data"
@@ -120,6 +125,7 @@ class MakeData:
         print(); print("Done.")
         # save to csv
         df_proc.T.to_csv("data/test_proc.csv", index=False)
+
 
     def main(self):
         self.split_train_test()

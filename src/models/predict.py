@@ -22,13 +22,14 @@ def predict(data, model_loc):
     res = output.argmax(dim=1, keepdim=True).numpy()[0][0] + 1 
     return res
 
+
 def main():
     parser = argparse.ArgumentParser(description='Captcha evaluation')
     parser.add_argument('--file-name', type=str, default="8_1587401157.16.png", metavar='N',
                         help='the location of the file to evaluate')
     args = parser.parse_args()
     true, res = predict(args.file_name)
-    print(f"True: {true}, Predicted: {res}")
+
 
 if __name__ == "__main__":
     main()
