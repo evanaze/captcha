@@ -36,10 +36,6 @@ def run():
                         help='disables CUDA training')
     parser.add_argument('--save-model', action='store_true', default=False,
                         help='For Saving the current Model')
-    parser.add_argument("-i", "--image", type=str, 
-                        help="The new image to predict on")
-    parser.add_argument("-r", "--retrain", action="store_true", 
-                        help="A flag for if we should retrain")
     args = parser.parse_args()
     # if we are using cuda
     use_cuda = not args.no_cuda and torch.cuda.is_available()

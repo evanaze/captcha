@@ -5,7 +5,7 @@ data:
 	python -m src.data.make_data
 
 train:
-	python -m src.run -r --save-model
+	python -m src.models.train --save-model
 
 eval:
 	python -m src.models.eval --square --dcnn
