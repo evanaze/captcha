@@ -1,13 +1,16 @@
 .PHONY: data train eval clean
 
 data:
+	# downloads the data from s3 and runs data processing
 	aws s3 sync s3://captcha-imgs/ data/raw
 	python -m src.data.make_data
 
 train:
-	python -m src.models.train --save-model
+	# trains on the full test data with the default settings
+	python -m src.models.train --full-model
 
 eval:
+	# evaluates OpenCV and Deep Learning Methods
 	python -m src.models.eval --square --dcnn
 
 clean:
