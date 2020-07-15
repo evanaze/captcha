@@ -70,10 +70,11 @@ def eval_dl(model="models/captcha_cnn_f0.pt"):
         parser.add_argument('--dcnn', '-d', store_true=True,
                         help='evaluate the DCNN model')
         args = parser.parse_args()
-
+        # if we should evaluate the opencv model
         if args.square:
             score = eval_cv()
             print("OpenCV precision:", score)
+        # if we should evaluate the dcnn model
         if args.dcnn:
             score = eval_dl()
             print("DCNN precision:", score)

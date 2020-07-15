@@ -6,7 +6,10 @@ import torch.nn.functional as F
 
 
 def train_fn(model, device, data_loader, optimizer, epoch):
+    "Performs and epoch of training"
+    # set the model into eval mode
     model.train()
+    # iterate through the training data
     for batch_idx, (data, target) in enumerate(data_loader):
         data, target = data.to(device), target.to(device)
         optimizer.zero_grad()
@@ -21,6 +24,7 @@ def train_fn(model, device, data_loader, optimizer, epoch):
 
 
 def eval_fn(model, device, data_loader):
+    "evaluates the current model on the validation set"
     model.eval()
     test_loss = 0
     correct = 0
