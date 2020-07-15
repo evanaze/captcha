@@ -37,11 +37,11 @@ class Train:
         self.model_name = "captcha_dcnn"
         # we just need the simplest transform
         self.transform = transforms.ToTensor()
-        self.model = Net().to(device)
+        self.model = Net().to(self.device)
         # initialize Ada optimizer
-        self.optimizer = optim.Adadelta(model.parameters(), lr=self.args.lr)
+        self.optimizer = optim.Adadelta(self.model.parameters(), lr=self.args.lr)
         # initialize the scheduler
-        self.scheduler = StepLR(optimizer, step_size=1, gamma=self.args.gamma)
+        self.scheduler = StepLR(self.optimizer, step_size=1, gamma=self.args.gamma)
 
 
     def full_model(self):
