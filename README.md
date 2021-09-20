@@ -1,5 +1,7 @@
+![Sample Captcha](data/raw/1_f676409e63c94448a5903a80e9da114f.png)
+
 # Captcha Solver and Object Counting
-This is a Python package for solving captchas that look like the one below:
+This is a Python package for solving captchas that look like the one above.
 
 ## Usage
 Pull the repo with the usual command:  
