@@ -1,7 +1,6 @@
 from __future__ import print_function, division
 import os
 import numpy as np
-import matplotlib.pyplot as plt
 import pandas as pd
 
 import torch
@@ -40,6 +39,7 @@ class CaptchaDataset(Dataset):
 
 
 if __name__ == "__main__":
+    import matplotlib.pyplot as plt
     "For viewing a couple of the images"
     captcha_dataset = CaptchaDataset(csv_file=config.TRAIN_DATA,
                                      root_dir=config.PROC_DIR)
